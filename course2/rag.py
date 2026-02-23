@@ -32,7 +32,7 @@ collection = client.create_collection("book_collection")
 def store_chunks(chunks, embeddings):
     for i, chunk in enumerate(chunks):
         collection.add(
-            documents=[chunks],
+            documents=[chunk],
             embeddings=[embeddings[i]],
         )    
 #finding revelant info
@@ -43,9 +43,9 @@ def retrieve(query, k=3):
         n_results=k
     )        
     return results["documents"][0]
+    context="\n\n".join(retrieved_docs)
 
 #memory handiling
-chat_history=[]
 chat_history_append({
     "role": "user",
     "countent": user_input
@@ -87,10 +87,11 @@ answer:
     return prompt
 
 #call llm
-
+from openai import OpenAI
+client=OpenAI()
 def call_llm(prompt):
-    response = openai.ChatCompletion.create(
-        model = gpt-4,
+    response = client.Chat.completion.create(
+        model = "gpt-4o-mini",
         message=[
             {"role": "system", "content": "you are a helpful assistant."},
             {"role": "user", "content": prompt}
@@ -126,5 +127,5 @@ if user_input:
     st.session_state.chat_history.append(("you", user_input))
     st.session_state.chat_history.append(("Bot", answer))
 
-for role, msg in st.scatter_chart_history:
+for role, msg in st.session_state.chat_history:
     st.write(f"**{role}:** {msg}")
