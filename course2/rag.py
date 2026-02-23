@@ -32,7 +32,7 @@ collection = client.create_collection("book_collection")
 def store_chunks(chunks, embeddings):
     for i, chunk in enumerate(chunks):
         collection.add(
-            ids=[str(i)]
+            ids=[str(i)],
             documents=[chunk],
             embeddings=[embeddings[i]],
         )    
@@ -41,13 +41,13 @@ def retrieve(query, k=3):
     query_embedding=model.encode([query])
     result=collection.query(
         query_embeddings=query_embedding,
-        n_results=k
+        n_results=k,
         context="\n\n".join(retrieved_docs)
     )        
     return result["documents"][0]
 
 #memory handiling
-chat_history[]
+chat_history=[]
 chat_history.append({
     "role": "user",
     "content": user_input
