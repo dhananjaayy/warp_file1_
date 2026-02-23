@@ -13,7 +13,7 @@ def chunk_text(text, chunk_size=500, overlap=100):
     chunks = []
     start=0
 
-    while start<lem(text):
+    while start<len(text):
        end=start + chunk_size
        chunk=text[start:end]
        chunks.append(chunk)
@@ -22,7 +22,7 @@ def chunk_text(text, chunk_size=500, overlap=100):
     return chunks
 # ebmading
 from sentence_transformers import SentenceTransformer
-model = SentenceTransformer("all-MiniM-L6-v2")
+model = SentenceTransformer("all-MiniLM-L6-v2")
 def embed_chunks(chunks):
     return model.encode(chunks)
 
@@ -32,6 +32,7 @@ collection = client.create_collection("book_collection")
 def store_chunks(chunks, embeddings):
     for i, chunk in enumerate(chunks):
         collection.add(
+            ids=[str(i)]
             documents=[chunk],
             embeddings=[embeddings[i]],
         )    
@@ -41,14 +42,15 @@ def retrieve(query, k=3):
     result=collection.query(
         query_embeddings=query_embedding,
         n_results=k
+        context="\n\n".join(retrieved_docs)
     )        
-    return results["documents"][0]
-    context="\n\n".join(retrieved_docs)
+    return result["documents"][0]
 
 #memory handiling
-chat_history_append({
+chat_history[]
+chat_history.append({
     "role": "user",
-    "countent": user_input
+    "content": user_input
 })
 
 def summarize_chat(history, llm):
@@ -90,14 +92,14 @@ answer:
 from openai import OpenAI
 client=OpenAI()
 def call_llm(prompt):
-    response = client.Chat.completion.create(
+    response = client.Chat.completions.create(
         model = "gpt-4o-mini",
-        message=[
+        messages=[
             {"role": "system", "content": "you are a helpful assistant."},
             {"role": "user", "content": prompt}
         ]
     )
-    return response["choice"][0]["message"]["content"]
+    return response.choices[0].message.content
 #putting all together
 def rag_agent(user_query):
     retrieved_docs = retrieve(user_query)
